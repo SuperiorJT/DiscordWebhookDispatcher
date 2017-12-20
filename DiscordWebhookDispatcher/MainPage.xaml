@@ -1,0 +1,106 @@
+﻿<Page
+    x:Class="DiscordWebhookDispatcher.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DiscordWebhookDispatcher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <TextBox x:Name="textBoxWebhookLink" PlaceholderText="Webhook Link" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBoxContent" Margin="24,56,24,0" TextWrapping="Wrap" PlaceholderText="Content" VerticalAlignment="Top" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="172"/>
+        <Button x:Name="buttonSendRequest" Content="Send Request" HorizontalAlignment="Right" Margin="0,0,24,24" VerticalAlignment="Bottom" Click="buttonSendRequest_Click"/>
+        <TextBlock Text="Add Embed" Style="{StaticResource TitleTextBlockStyle}" Margin="24,96,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Grid Margin="24,130,24,80">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button x:Name="buttonAddEmbed" Content="Add Embed" VerticalAlignment="Bottom" Grid.Column="0" Click="buttonAddEmbed_Click" HorizontalAlignment="Right" Margin="0,0,0,-48"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="0" Padding="0,0,24,0">
+                <StackPanel>
+                    <TextBox x:Name="textBoxEmbedTitle" PlaceholderText="Title"></TextBox>
+                    <TextBox x:Name="textBoxEmbedDescription" PlaceholderText="Description" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedUrl" PlaceholderText="URL" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedTimestamp" PlaceholderText="Timestamp" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedFooterIconUrl" Header="Footer" PlaceholderText="Icon URL" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedFooterText" PlaceholderText="Text" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedThumbnailUrl" Header="Thumbnail" PlaceholderText="URL" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedImageUrl" Header="Image" PlaceholderText="URL" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedAuthorName" Header="Author" PlaceholderText="Name" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedAuthorUrl" PlaceholderText="URL" Margin="0,16,0,0"></TextBox>
+                    <TextBox x:Name="textBoxEmbedAuthorIconUrl" PlaceholderText="Icon URL" Margin="0,16,0,0"></TextBox>
+                    <ListView x:Name="listViewEmbedFields" Margin="0,16,0,0" Header="Fields" HorizontalAlignment="Stretch" ItemsSource="{Binding EmbedFields}" SelectionMode="None">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0,0,0,16"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <RelativePanel>
+                                    <StackPanel x:Name="stackPanelEmbedFields" 
+                                            RelativePanel.AlignLeftWithPanel="True"
+                                            Width="620">
+                                        <TextBox Text="{Binding Name}" PlaceholderText="Field Name"></TextBox>
+                                        <TextBox Text="{Binding Value}" PlaceholderText="Field Value" Margin="0,16,0,0"></TextBox>
+                                    </StackPanel>
+                                    <Grid x:Name="gridEmbedFieldsDelete"
+                                      RelativePanel.AlignRightWithPanel="True"
+                                      RelativePanel.AlignBottomWithPanel="True"
+                                      RelativePanel.AlignTopWithPanel="True"
+                                      RelativePanel.RightOf="stackPanelEmbedFields">
+                                        <Button x:Name="buttonEmbedFieldDelete" Tag="{Binding}" Content="Delete" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Click="buttonEmbedFieldDelete_Click"></Button>
+                                    </Grid>
+                                </RelativePanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <Button x:Name="buttonAddEmbedFieldFlyout" Content="Add Field" Margin="0,16,0,0" HorizontalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout x:Name="flyoutAddEmbedField" Closed="flyoutAddEmbedField_Closed">
+                                <StackPanel>
+                                    <TextBox x:Name="textBoxEmbedFieldName" PlaceholderText="Name" Width="400"></TextBox>
+                                    <TextBox x:Name="textBoxEmbedFieldValue" PlaceholderText="Value" Width="400" Margin="0,16,0,0"></TextBox>
+                                    <TextBlock x:Name="textBlockFieldError" Visibility="Collapsed" Text="Both fields are required. Supply data and try again."></TextBlock>
+                                    <Grid Margin="0,16,0,0">
+                                        <Button x:Name="buttonAddEmbedFieldCancel" Content="Cancel" HorizontalAlignment="Left" Click="buttonAddEmbedFieldCancel_Click"></Button>
+                                        <Button x:Name="buttonAddEmbedField" Content="Add" HorizontalAlignment="Right" Click="buttonAddEmbedField_Click"></Button>
+                                    </Grid>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+            </ScrollViewer>
+            <ScrollViewer Grid.Column="1" Margin="16,0,0,0">
+                <ListView ItemsSource="{Binding Embeds}" SelectionMode="None" IsItemClickEnabled="True">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Padding" Value="32,0"/>
+                            <Setter Property="Margin" Value="0,0,0,16"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Height="64">
+                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center"></TextBlock>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button x:Name="buttonEmbedListItem" Tag="{Binding}" Click="buttonEmbedListItem_Click">
+                                        <SymbolIcon Symbol="Delete"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>
